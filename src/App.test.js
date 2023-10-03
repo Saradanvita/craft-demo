@@ -1,8 +1,12 @@
-import { render, screen } from '@testing-library/react';
-import App from './App';
+import React from "react";
+import { fireEvent, getByTestId, render, screen } from "@testing-library/react";
 
-test('renders learn react link', () => {
-  render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+import { TestableApp } from "../src/App";
+
+describe("TestableApp", () => {
+  it("should render the loaded state correctly", () => {
+    const { container } = render(<TestableApp />);
+    fireEvent.click(screen.getByTestId("register-button"));
+    expect(getByTestId(container, "app")).toBeInTheDocument();
+  });
 });
