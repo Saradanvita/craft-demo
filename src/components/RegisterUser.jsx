@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
+import { useNavigate } from "react-router-dom";
 
-const RegisterUser = ({ setPage, user, setUser }) => {
+const RegisterUser = ({ user, setUser }) => {
+  const navigate = useNavigate();
   useEffect(() => {
     setUser("");
   }, []);
@@ -30,7 +32,7 @@ const RegisterUser = ({ setPage, user, setUser }) => {
         if (data["status"] === "User already exists") {
           setError(true);
         } else {
-          setPage("events");
+          navigate("/events");
         }
       });
   };
@@ -104,7 +106,7 @@ const RegisterUser = ({ setPage, user, setUser }) => {
             {error ? (
               <Button
                 onClick={() => {
-                  setPage("events");
+                  navigate("/login");
                 }}
                 variant="contained"
               >

@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
+import { useNavigate } from "react-router-dom";
 
-const LoginUser = ({ setPage, user, setUser, password, setPassword }) => {
+const LoginUser = ({ user, setUser, password, setPassword }) => {
+  const navigate = useNavigate();
   const [error, setError] = useState(false);
   const loginUser = () => {
     fetch("http://localhost:8080/api/v1/user/read", {
@@ -19,7 +21,7 @@ const LoginUser = ({ setPage, user, setUser, password, setPassword }) => {
         if (data["userid"] === "-1") {
           setError(true);
         } else {
-          setPage("events");
+          navigate("/events");
         }
       });
   };
@@ -95,7 +97,7 @@ const LoginUser = ({ setPage, user, setUser, password, setPassword }) => {
             <p style={{ marginRight: "35px" }}>New to our platform?</p>
             <Button
               onClick={() => {
-                setPage("register");
+                navigate("/register");
               }}
               size="small"
               data-testid="register-button"

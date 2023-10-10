@@ -4,59 +4,90 @@ import RegisteredEvents from "./RegisteredEvents";
 import Divider from "@mui/material/Divider";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import Button from "@mui/material/Button";
+import { useNavigate } from "react-router-dom";
 
-const Events = ({ setPage, user }) => {
+const Events = ({ setUser, user, setPassword }) => {
+  const navigate = useNavigate();
   const [events, setEvents] = useState([]);
   const [formattedEvents, setFormattedEvents] = useState([]);
   const [registeredEvents, setRegisteredEvents] = useState([]);
   const [count, setCount] = useState(0);
   useEffect(() => {
-    fetch("http://localhost:8080/api/v1/sports/events", { method: "POST" })
-      .then((response) => {
-        return response.json();
+    if (user !== "") {
+      fetch("http://localhost:8080/api/v1/sports/events", { method: "POST" })
+        .then((response) => {
+          return response.json();
+        })
+        .then((data) => {
+          setEvents(data);
+        });
+      fetch("http://localhost:8080/api/v1/events/registered", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ user }),
       })
-      .then((data) => {
-        setEvents(data);
-      });
-    fetch("http://localhost:8080/api/v1/events/registered", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ user }),
-    })
-      .then((response) => {
-        return response.json();
-      })
-      .then((data) => {
-        setRegisteredEvents(data);
-      });
+        .then((response) => {
+          return response.json();
+        })
+        .then((data) => {
+          setRegisteredEvents(data);
+        });
+    }
   }, []);
 
   useEffect(() => {
-    const fEvents = [];
-    const x = {};
-    let c = 0;
-    registeredEvents.forEach((rEvent) => {
-      x[rEvent["id"]] = rEvent["status"];
-      if (rEvent["status"] === "REGISTERED") c++;
-    });
-    events.forEach((e) => {
-      if (x[e["id"]] !== undefined) {
-        fEvents.push({
-          ...e,
-          status: x[e["id"]],
-        });
-      } else {
-        fEvents.push({
-          ...e,
-          status: "NOT_REGISTERED",
-        });
-      }
-    });
-    setFormattedEvents(fEvents);
-    setCount(c);
+    if (user !== "") {
+      const fEvents = [];
+      const x = {};
+      let c = 0;
+      registeredEvents.forEach((rEvent) => {
+        x[rEvent["id"]] = rEvent["status"];
+        if (rEvent["status"] === "REGISTERED") c++;
+      });
+      events.forEach((e) => {
+        if (x[e["id"]] !== undefined) {
+          fEvents.push({
+            ...e,
+            status: x[e["id"]],
+          });
+        } else {
+          fEvents.push({
+            ...e,
+            status: "NOT_REGISTERED",
+          });
+        }
+      });
+      setFormattedEvents(fEvents);
+      setCount(c);
+    }
   }, [events, registeredEvents]);
+
+  if (user === "") {
+    return (
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <p>User is not authorised to view this content. Please login first. </p>
+        <div style={{ marginLeft: "10px" }}>
+          <Button
+            onClick={() => {
+              navigate("/login");
+            }}
+            variant="contained"
+          >
+            Login
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -80,7 +111,9 @@ const Events = ({ setPage, user }) => {
             size="small"
             startIcon={<LogoutRoundedIcon />}
             onClick={() => {
-              setPage("login");
+              setUser("");
+              setPassword("");
+              navigate("/login");
             }}
           >
             Logout

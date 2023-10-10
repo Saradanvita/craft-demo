@@ -1,53 +1,57 @@
 import React, { useState, Suspense, lazy } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import Events from "./components/Events";
 import LoginUser from "./components/LoginUser";
 const RegisterUser = lazy(() => import("./components/RegisterUser"));
 
 const App = () => {
-  const [page, setPage] = useState("login");
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
 
-  const getPage = () => {
-    switch (page) {
-      case "login":
-        return (
-          <LoginUser
-            setPage={setPage}
-            user={user}
-            setUser={setUser}
-            password={password}
-            setPassword={setPassword}
-          />
-        );
-      case "register":
-        return (
-          <Suspense
-            fallback={
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignSelf: "center",
-                }}
-              >
-                Register user component is loading please wait...
-              </div>
-            }
-          >
-            <RegisterUser setPage={setPage} user={user} setUser={setUser} />
-          </Suspense>
-        );
-      case "events":
-        return <Events setPage={setPage} user={user} />;
-      default:
-        <div></div>;
-    }
-  };
   return (
     <div data-testid="app" style={{ backgroundColor: "white" }}>
-      {getPage()}
+      <Router>
+        <Routes>
+          <Route
+            path="/login"
+            element={
+              <LoginUser
+                user={user}
+                setUser={setUser}
+                password={password}
+                setPassword={setPassword}
+              />
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              <Suspense
+                fallback={
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignSelf: "center",
+                    }}
+                  >
+                    Register user component is loading please wait...
+                  </div>
+                }
+              >
+                <RegisterUser user={user} setUser={setUser} />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/events"
+            element={
+              <Events user={user} setUser={setUser} setPassword={setPassword} />
+            }
+          />
+        </Routes>
+      </Router>
     </div>
   );
 };
